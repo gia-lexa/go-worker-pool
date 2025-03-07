@@ -1,32 +1,37 @@
 package main
 
 import (
-	"flag"      // Package for parsing CLI arguments
+	"flag"      // Package for parsing command-line arguments
 	"fmt"       // Package for formatted I/O
 	"math/rand" // Package for generating random numbers
 	"sync"      // Package for concurrency utilities (WaitGroup, Mutex)
 	"time"      // Package for time handling
 )
 
-// worker function that processes jobs and retries on failure
+// Define CLI flags as global variables so tests can access them
+var numWorkers = flag.Int("workers", 3, "Number of worker goroutines")            // Number of workers
+var numJobs = flag.Int("jobs", 10, "Total number of jobs to process")             // Number of jobs
+var maxRetries = flag.Int("retries", 3, "Maximum retries per job before failing") // Max retry limit
+
+// worker function processes jobs and retries on failure
 func worker(id int, jobs chan int, results chan<- int, errors chan<- error, retries map[int]int, maxRetries int, mutex *sync.Mutex, wg *sync.WaitGroup) {
 	defer wg.Done() // Ensure the WaitGroup counter decreases when the function exits
 
 	for job := range jobs { // Continuously receive jobs from the jobs channel
-		fmt.Printf("Worker %d processing job %d (Attempt %d)\n", id, job, retries[job]+1)
-		time.Sleep(time.Second) // Simulate processing time
+		fmt.Printf("Worker %d processing job %d (Attempt %d)\n", id, job, retries[job]+1) // Print worker progress
+		time.Sleep(time.Second)                                                           // Simulate processing time by sleeping for 1 second
 
 		// Simulate a random failure in 30% of cases
 		if rand.Float32() < 0.3 {
-			mutex.Lock()                   // Lock before modifying the retries map to avoid race conditions
+			mutex.Lock()                   // Lock before modifying the retries map to prevent race conditions
 			retries[job]++                 // Increment the retry counter for this job
-			if retries[job] < maxRetries { // Check if job can be retried
-				fmt.Printf("Worker %d: Job %d failed, retrying...\n", id, job)
-				jobs <- job // Resend job for another attempt
+			if retries[job] < maxRetries { // Check if the job is within retry limit
+				fmt.Printf("Worker %d: Job %d failed, retrying...\n", id, job) // Log retry attempt
+				jobs <- job                                                    // Resend job for another attempt
 			} else {
-				errors <- fmt.Errorf("worker %d: job %d failed after %d attempts", id, job, maxRetries) // Log final failure
+				errors <- fmt.Errorf("worker %d: job %d failed after %d attempts", id, job, maxRetries) // Send error if retries exhausted
 			}
-			mutex.Unlock() // Unlock to allow other goroutines to modify retries
+			mutex.Unlock() // Unlock after modifying retries map
 			continue       // Skip sending a result since the job failed
 		}
 
@@ -35,23 +40,16 @@ func worker(id int, jobs chan int, results chan<- int, errors chan<- error, retr
 }
 
 func main() {
-	// Define CLI arguments using Go's flag package
-	numWorkers := flag.Int("workers", 3, "Number of worker goroutines") // Number of worker goroutines
-	numJobs := flag.Int("jobs", 10, "Total number of jobs to process")  // Total jobs to be processed
-	maxRetries := flag.Int("retries", 3, "Maximum retries per job")     // Max retry attempts per job before failing
-
 	flag.Parse() // Parse CLI arguments from user input
 
 	rand.Seed(time.Now().UnixNano()) // Initialize random seed for failure simulation
 
-	// Create necessary channels and sync structures
-	jobs := make(chan int, *numJobs)     // Buffered channel to send jobs to workers
-	results := make(chan int, *numJobs)  // Buffered channel to receive successful results
-	errors := make(chan error, *numJobs) // Buffered channel for error messages
-	var wg sync.WaitGroup                // WaitGroup to track when all workers are done
-	mutex := &sync.Mutex{}               // Mutex to prevent concurrent writes to retries map
-
-	retries := make(map[int]int) // Map to track how many times each job has been retried
+	jobs := make(chan int, *numJobs)     // Create a buffered channel to send jobs to workers
+	results := make(chan int, *numJobs)  // Create a buffered channel to receive successful results
+	errors := make(chan error, *numJobs) // Create a buffered channel to store error messages
+	var wg sync.WaitGroup                // Define a WaitGroup to track when all workers are done
+	mutex := &sync.Mutex{}               // Define a mutex to prevent concurrent map writes
+	retries := make(map[int]int)         // Define a map to track how many times each job has been retried
 
 	// Start worker goroutines
 	for i := 1; i <= *numWorkers; i++ {
@@ -65,8 +63,7 @@ func main() {
 	}
 	close(jobs) // Close the jobs channel after all jobs are sent to prevent deadlocks
 
-	// Wait for workers to finish processing
-	wg.Wait()      // Block main function until all workers have finished their tasks
+	wg.Wait()      // Wait for all workers to finish processing
 	close(results) // Close results channel after all workers finish
 	close(errors)  // Close errors channel after all workers finish
 
