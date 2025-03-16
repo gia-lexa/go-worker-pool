@@ -18,16 +18,22 @@ func worker(id int, jobs chan int, results chan<- int, errors chan<- error, retr
 	defer wg.Done() // Ensure the WaitGroup counter decreases when the function exits
 
 	for job := range jobs { // Continuously receive jobs from the jobs channel
-		fmt.Printf("Worker %d processing job %d (Attempt %d)\n", id, job, retries[job]+1) // Print worker progress
-		time.Sleep(time.Second)                                                           // Simulate processing time by sleeping for 1 second
+		fmt.Printf("Worker %d processing job %d (Attempt %d)\n", id, job, retries[job]+1)
+		time.Sleep(time.Second) // Simulate processing time by sleeping for 1 second
 
 		// Simulate a random failure in 30% of cases
 		if rand.Float32() < 0.3 {
 			mutex.Lock()                   // Lock before modifying the retries map to prevent race conditions
 			retries[job]++                 // Increment the retry counter for this job
 			if retries[job] < maxRetries { // Check if the job is within retry limit
-				fmt.Printf("Worker %d: Job %d failed, retrying...\n", id, job) // Log retry attempt
-				jobs <- job                                                    // Resend job for another attempt
+				fmt.Printf("Worker %d: Job %d failed, retrying...\n", id, job)
+
+				// **Check if channel is still open before sending**
+				select {
+				case jobs <- job:
+				default:
+					fmt.Printf("Worker %d: Job %d could not be retried because channel is closed\n", id, job)
+				}
 			} else {
 				errors <- fmt.Errorf("worker %d: job %d failed after %d attempts", id, job, maxRetries) // Send error if retries exhausted
 			}
