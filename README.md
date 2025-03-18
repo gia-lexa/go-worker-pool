@@ -1,4 +1,4 @@
-Go Worker Pool with Retries
+# Go Worker Pool with Retries
 
 🚀 Overview
 
@@ -32,34 +32,34 @@ If a job fails, it automatically retries up to a defined limit before marking it
 
 ✅ GitHub Actions CI – Automatically runs tests on every push.
 
-🛠️ Setup & Usage
+
+
+## Setup & Usage
 
 1️⃣ Install & Run
 
-Clone the repo and build the project:
-
-# Clone repository
+```
 git clone https://github.com/yourusername/go-load-tester.git
 cd go-load-tester
+```
 
-# Run with default settings
+2️⃣ Run with default settings
 ```
 go run main.go
 ```
 
-2️⃣ Run with Custom CLI Arguments
+2️⃣ Run with Customizable CLI Arguments
 
-Adjust the number of workers, jobs, and retry attempts:
 ```
 go run main.go --workers=5 --jobs=20 --retries=3
 ```
 
 3️⃣ Run Tests
 
-Execute unit tests to validate worker behavior:
 ```
 go test -v
 ```
+
 
 🏎️ Benchmarking (Challenges & Next Steps)
 
@@ -71,7 +71,8 @@ I attempted to benchmark the worker pool, but faced unique challenges:
 
 - Go's b.N scaling – The benchmark runner dynamically sets b.N, but the presence of retries led to inconsistent performance results.
 
-🔹 Next Steps
+
+## Next Steps
 
 To properly benchmark, I could:
 
@@ -80,6 +81,8 @@ To properly benchmark, I could:
 - Track execution time per worker – Instead of total time, record each worker’s processing speed.
 
 - Log performance data instead of benchmarking – Capture real-world execution stats without go test -bench constraints.
+
+
 
 🎯 Future Improvements
 
@@ -90,6 +93,7 @@ To properly benchmark, I could:
 🔹 Retry Backoff – Use an exponential backoff for failed job retries.
 
 🔹 More Robust Benchmarking – Develop a specialized benchmark without retries interfering.
+
 
 
 🚀 Ready to Load Test? Let’s Go!
