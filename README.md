@@ -96,4 +96,4 @@ To properly benchmark, I could:
 
 
 
-### 🚀 Ready to Load Test? Let’s Go!
+### 🚀 Let’s Go!
