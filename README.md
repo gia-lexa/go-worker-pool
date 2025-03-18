@@ -1,10 +1,10 @@
 # Go Worker Pool with Retries
 
-🚀 Overview
+### 🚀 Overview
 
 This Go project implements a concurrent worker pool that processes jobs efficiently using goroutines and channels. It is designed for real-world scenarios where tasks need to be executed in parallel, such as:
 
-🔹 Real-World Use Cases
+### 🔹 Real-World Use Cases
 
 - Data Processing Pipelines – Handling large-scale batch jobs like log analysis or ETL workflows.
 
@@ -18,7 +18,7 @@ This Go project implements a concurrent worker pool that processes jobs efficien
 
 If a job fails, it automatically retries up to a defined limit before marking it as failed. The number of workers, jobs, and retry attempts are fully configurable via CLI arguments, making this project highly flexible and scalable.
 
-🔹 Features
+### 🔹 Features
 
 ✅ Concurrent Processing – Uses goroutines & channels to process jobs efficiently.
 
@@ -36,32 +36,32 @@ If a job fails, it automatically retries up to a defined limit before marking it
 
 ## Setup & Usage
 
-1️⃣ Install & Run
+### 1️⃣ Install & Run
 
 ```
 git clone https://github.com/yourusername/go-load-tester.git
 cd go-load-tester
 ```
 
-2️⃣ Run with default settings
+### 2️⃣ Run with default settings
 ```
 go run main.go
 ```
 
-2️⃣ Run with Customizable CLI Arguments
+### 2️⃣ Run with Customizable CLI Arguments
 
 ```
 go run main.go --workers=5 --jobs=20 --retries=3
 ```
 
-3️⃣ Run Tests
+### 3️⃣ Run Tests
 
 ```
 go test -v
 ```
 
 
-🏎️ Benchmarking (Challenges & Next Steps)
+### 🏎️ Benchmarking (Challenges & Next Steps)
 
 I attempted to benchmark the worker pool, but faced unique challenges:
 
@@ -72,7 +72,7 @@ I attempted to benchmark the worker pool, but faced unique challenges:
 - Go's b.N scaling – The benchmark runner dynamically sets b.N, but the presence of retries led to inconsistent performance results.
 
 
-## Next Steps
+### Next Steps
 
 To properly benchmark, I could:
 
@@ -84,7 +84,7 @@ To properly benchmark, I could:
 
 
 
-🎯 Future Improvements
+### 🎯 Future Improvements
 
 🔹 Logging – Save job results & errors to a file for debugging.
 
@@ -96,4 +96,4 @@ To properly benchmark, I could:
 
 
 
-🚀 Ready to Load Test? Let’s Go!
+### 🚀 Ready to Load Test? Let’s Go!
