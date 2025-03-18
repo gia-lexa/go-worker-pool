@@ -2,7 +2,7 @@
 
 ### 🚀 Overview
 
-This Go project implements a concurrent worker pool that processes jobs efficiently using goroutines and channels. It is designed for real-world scenarios where tasks need to be executed in parallel, such as:
+This Go project implements a concurrent worker pool that processes jobs efficiently using goroutines and channels. It mirrors what would be necessary for real-world scenarios where tasks need to be executed in parallel, such as:
 
 ### 🔹 Real-World Use Cases
 
